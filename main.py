@@ -135,7 +135,8 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             _, loss = sess.run([train_op, cross_entropy_loss], feed_dict={input_image: image, correct_label: label, keep_prob: 0.6, learning_rate: 0.0001})
             count += 1
             average_loss += loss
-        print("Epoch: {}, Loss: {:.4f}".format(epoch + 1, average_loss/count))
+            print('loss: {:.4f}'.format(loss), end=', ' )
+        print("Epoch: {}, Avg Loss: {:.4f}".format(epoch + 1, average_loss/count))
 tests.test_train_nn(train_nn)
 
 
@@ -147,8 +148,8 @@ def run():
     tests.test_for_kitti_dataset(data_dir)
     correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
     learning_rate = tf.placeholder(tf.float32, name='learning_rate')
-    epochs = 10
-    batch_size = 20
+    epochs = 20
+    batch_size = 5
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
 
