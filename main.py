@@ -23,7 +23,6 @@ def load_vgg(sess, vgg_path):
     :param vgg_path: Path to vgg folder, containing "variables/" and "saved_model.pb"
     :return: Tuple of Tensors from VGG model (image_input, keep_prob, layer3_out, layer4_out, layer7_out)
     """
-    # TODO: Implement function
     #   Use tf.saved_model.loader.load to load the model and weights
     vgg_tag = 'vgg16'
     vgg_input_tensor_name = 'image_input:0'
@@ -63,7 +62,6 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     :param num_classes: Number of classes to classify
     :return: The Tensor for the last layer of output
     """
-    # TODO: Implement function
     # 1x1
     conv_1x1 = conv2d_transpose(vgg_layer7_out, num_classes, kernel = 1, stride = 1)
     # 4x conv7 layer (32/4 = 8):
@@ -98,19 +96,35 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     :param num_classes: Number of classes to classify
     :return: Tuple of (logits, train_op, cross_entropy_loss)
     """
-    # TODO: Implement function
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
+    # print('logits type: ', logits.dtype)
     correct_label = tf.reshape(correct_label, (-1,num_classes))
+    # print('correct_label: ', correct_label.dtype)
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = logits, labels = correct_label))
     optimizer = tf.train.AdamOptimizer(learning_rate)
     training_op = optimizer.minimize(cross_entropy_loss)
+    # correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(correct_label, 1))
+    # print('correct_prediction: ', correct_prediction.dtype)
+    # accuracy_op = tf.reduce_mean(correct_predction)
+    accuracy_op = tf.constant(0);
 
-    return logits, training_op, cross_entropy_loss
+    return logits, training_op, cross_entropy_loss, accuracy_op
 tests.test_optimize(optimize)
 
+def evaluate(sess, input_image, correct_label, cross_entropy_loss, accuracy_op, batch_size, get_batches_fn):
+    total_accuracy = 0.0
+    total_loss = 0.0
+    count = 0
+    for image, label in get_batches_fn(batch_size):
+        loss, accuracy = sess.run([cross_entropy_loss, accuracy_op], 
+                               feed_dict={input_image: image, correct_label: label,keep_prob: 1.0})
+        total_accuracy += accuracy
+        total_loss += loss
+        count += 1
+    return total_loss/count, total_accuracy/count
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
-             correct_label, keep_prob, learning_rate):
+             correct_label, keep_prob, learning_rate, accuracy_op):
     """
     Train neural network and print out the loss during training.
     :param sess: TF Session
@@ -123,15 +137,20 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param correct_label: TF Placeholder for label images
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
+    :param accuracy_op: TF Placeholder for the accuracy
     """
-    # TODO: Implement function
     sess.run(tf.global_variables_initializer())
+    print('Starting Training..., Epochs: {}, batch size: {}'.format(epochs, batch_size))
     for epoch in range(epochs):
-        print("Epoch: ", epoch)
+        average_loss = 0.0
+        count = 0;
         for image, label in get_batches_fn(batch_size):
-            _, loss = sess.run([train_op, cross_entropy_loss], 
-                               feed_dict={input_image: image, correct_label: label,keep_prob: 0.5, learning_rate: 0.001})
-            print("Loss: = {:.3f}".format(loss))
+            _, loss = sess.run([train_op, cross_entropy_loss], feed_dict={input_image: image, correct_label: label, keep_prob: 0.6, learning_rate: 0.0001})
+            count += 1
+            average_loss += loss
+        # loss, accuracy = evaluate(sess, input_image, correct_label, cross_entropy_loss, accuracy_op, batch_size, get_batches_fn)
+        # print("Epoch: {}, Loss: {:.4f}, Accuracy: {:.4f}".format(epoch, loss, accuracy))
+        print("Epoch: {}, Loss: {:.4f}".format(epoch, average_loss/count))
 tests.test_train_nn(train_nn)
 
 
@@ -144,7 +163,7 @@ def run():
     correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
     learning_rate = tf.placeholder(tf.float32, name='learning_rate')
     epochs = 5
-    batch_size = 1
+    batch_size = 20
     # Download pretrained vgg model
     helper.maybe_download_pretrained_vgg(data_dir)
 
@@ -162,16 +181,13 @@ def run():
         # OPTIONAL: Augment Images for better results
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
-        # TODO: Build NN using load_vgg, layers, and optimize function
         vgg_input_tensor, vgg_keep_prob_tensor, vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor = load_vgg(sess, vgg_path)
         layer = layers(vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor, num_classes)
-        logits, train_op, cross_entropy_loss = optimize(layer, correct_label, learning_rate, num_classes)
-        # TODO: Train NN using the train_nn function
-        train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, vgg_input_tensor,
-              correct_label, vgg_keep_prob_tensor, learning_rate)
+        logits, train_op, cross_entropy_loss, accuracy_op = optimize(layer, correct_label, learning_rate, num_classes)
+        # train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, vgg_input_tensor,
+        #       correct_label, vgg_keep_prob_tensor, learning_rate, accuracy_op)
 
-        # TODO: Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, vgg_keep_prob_tensor, vgg_input_tensor)
+        # helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, vgg_keep_prob_tensor, vgg_input_tensor)
 
         # OPTIONAL: Apply the trained model to a video
 
