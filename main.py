@@ -65,9 +65,9 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
     # TODO: Implement function
     # 1x1
-    # conv_1x1 = conv2d_transpose(vgg_layer7_out, num_classes, kernel = 1, stride = 1)
+    conv_1x1 = conv2d_transpose(vgg_layer7_out, num_classes, kernel = 1, stride = 1)
     # 4x conv7 layer (32/4 = 8):
-    output = conv2d_transpose(vgg_layer7_out, num_classes, kernel = 8, stride = 4)
+    output = conv2d_transpose(conv_1x1, num_classes, kernel = 8, stride = 4)
     print('original conv7 shape: ', vgg_layer7_out.shape)
     print('4x conv7 shape: ', output.shape)
     # 2x conv4 layer:
@@ -127,10 +127,11 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     # TODO: Implement function
     sess.run(tf.global_variables_initializer())
     for epoch in range(epochs):
+        print("Epoch: ", epoch)
         for image, label in get_batches_fn(batch_size):
-            sess.run(train_op, feed_dict={input_image: image, correct_label: label, keep_prob: .5})
-            loss = sess.run(cross_entropy_loss, feed_dict={input_image: image, correct_label: label, keep_prob: 1.})
-
+            _, loss = sess.run([train_op, cross_entropy_loss], 
+                               feed_dict={input_image: image, correct_label: label,keep_prob: 0.5, learning_rate: 0.001})
+            print("Loss: = {:.3f}".format(loss))
 tests.test_train_nn(train_nn)
 
 
@@ -140,9 +141,9 @@ def run():
     data_dir = './data'
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
-    correct_label = tf.placeholder(tf.float32, name='correct_label')
+    correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
-    learning_rate = 0.0001
+    learning_rate = tf.placeholder(tf.float32, name='learning_rate')
     epochs = 5
     batch_size = 1
     # Download pretrained vgg model
@@ -168,7 +169,7 @@ def run():
         logits, train_op, cross_entropy_loss = optimize(layer, correct_label, learning_rate, num_classes)
         # TODO: Train NN using the train_nn function
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, vgg_input_tensor,
-             correct_label, keep_prob, learning_rate)
+              correct_label, keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
