@@ -132,10 +132,10 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         average_loss = 0.0
         count = 0;
         for image, label in get_batches_fn(batch_size):
-            _, loss = sess.run([train_op, cross_entropy_loss], feed_dict={input_image: image, correct_label: label, keep_prob: 0.6, learning_rate: 0.0001})
+            _, loss = sess.run([train_op, cross_entropy_loss], feed_dict={input_image: image, correct_label: label, keep_prob: 0.75, learning_rate: 0.0008})
             count += 1
             average_loss += loss
-            print('loss: {:.4f}'.format(loss), end=', ' )
+            # print('loss: {:.4f}'.format(loss), end=', ' )
         print("Epoch: {}, Avg Loss: {:.4f}".format(epoch + 1, average_loss/count))
 tests.test_train_nn(train_nn)
 
