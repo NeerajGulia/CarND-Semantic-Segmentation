@@ -21,28 +21,28 @@ Download the [Kitti Road dataset](http://www.cvlibs.net/datasets/kitti/eval_road
 * Learning Rate: 0.0008
 
 ### Training and Loss
-Starting Training..., Epochs: 20, batch size: 5
-Epoch: 1, Avg Loss: 0.7576
-Epoch: 2, Avg Loss: 0.4806
-Epoch: 3, Avg Loss: 0.3421
-Epoch: 4, Avg Loss: 0.2997
-Epoch: 5, Avg Loss: 0.2805
-Epoch: 6, Avg Loss: 0.2574
-Epoch: 7, Avg Loss: 0.2428
-Epoch: 8, Avg Loss: 0.2269
-Epoch: 9, Avg Loss: 0.2262
-Epoch: 10, Avg Loss: 0.2191
-Epoch: 11, Avg Loss: 0.1963
-Epoch: 12, Avg Loss: 0.1856
-Epoch: 13, Avg Loss: 0.1795
-Epoch: 14, Avg Loss: 0.1717
-Epoch: 15, Avg Loss: 0.1661
-Epoch: 16, Avg Loss: 0.1663
-Epoch: 17, Avg Loss: 0.1554
-Epoch: 18, Avg Loss: 0.1516
-Epoch: 19, Avg Loss: 0.1521
-Epoch: 20, Avg Loss: 0.1496
-Training Finished. Saving test images to: ./runs/1526903112.2813175
+    Starting Training..., Epochs: 20, batch size: 5
+    Epoch: 1, Avg Loss: 0.7576
+    Epoch: 2, Avg Loss: 0.4806
+    Epoch: 3, Avg Loss: 0.3421
+    Epoch: 4, Avg Loss: 0.2997
+    Epoch: 5, Avg Loss: 0.2805
+    Epoch: 6, Avg Loss: 0.2574
+    Epoch: 7, Avg Loss: 0.2428
+    Epoch: 8, Avg Loss: 0.2269
+    Epoch: 9, Avg Loss: 0.2262
+    Epoch: 10, Avg Loss: 0.2191
+    Epoch: 11, Avg Loss: 0.1963
+    Epoch: 12, Avg Loss: 0.1856
+    Epoch: 13, Avg Loss: 0.1795
+    Epoch: 14, Avg Loss: 0.1717
+    Epoch: 15, Avg Loss: 0.1661
+    Epoch: 16, Avg Loss: 0.1663
+    Epoch: 17, Avg Loss: 0.1554
+    Epoch: 18, Avg Loss: 0.1516
+    Epoch: 19, Avg Loss: 0.1521
+    Epoch: 20, Avg Loss: 0.1496
+    Training Finished. Saving test images to: ./runs/1526903112.2813175
 
 ### Results
 
