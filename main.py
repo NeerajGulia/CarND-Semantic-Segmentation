@@ -100,7 +100,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     """
     # TODO: Implement function
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
-    correct_label = tf.reshape(correct_label, (-1,))
+    correct_label = tf.reshape(correct_label, (-1,num_classes))
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = logits, labels = correct_label))
     optimizer = tf.train.AdamOptimizer(learning_rate)
     training_op = optimizer.minimize(cross_entropy_loss)
@@ -142,7 +142,6 @@ def run():
     runs_dir = './runs'
     tests.test_for_kitti_dataset(data_dir)
     correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
-    keep_prob = tf.placeholder(tf.float32, name='keep_prob')
     learning_rate = tf.placeholder(tf.float32, name='learning_rate')
     epochs = 5
     batch_size = 1
@@ -169,10 +168,10 @@ def run():
         logits, train_op, cross_entropy_loss = optimize(layer, correct_label, learning_rate, num_classes)
         # TODO: Train NN using the train_nn function
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, vgg_input_tensor,
-              correct_label, keep_prob, learning_rate)
+              correct_label, vgg_keep_prob_tensor, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
-        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, vgg_keep_prob_tensor, vgg_input_tensor)
 
         # OPTIONAL: Apply the trained model to a video
 
