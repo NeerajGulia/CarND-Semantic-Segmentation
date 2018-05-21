@@ -169,10 +169,10 @@ def run():
         vgg_input_tensor, vgg_keep_prob_tensor, vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor = load_vgg(sess, vgg_path)
         layer = layers(vgg_layer3_out_tensor, vgg_layer4_out_tensor, vgg_layer7_out_tensor, num_classes)
         logits, train_op, cross_entropy_loss = optimize(layer, correct_label, learning_rate, num_classes)
-        # train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, vgg_input_tensor,
-        #       correct_label, vgg_keep_prob_tensor, learning_rate)
+        train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, vgg_input_tensor,
+              correct_label, vgg_keep_prob_tensor, learning_rate)
 
-        # helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, vgg_keep_prob_tensor, vgg_input_tensor)
+        helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, vgg_keep_prob_tensor, vgg_input_tensor)
 
         # OPTIONAL: Apply the trained model to a video
 
